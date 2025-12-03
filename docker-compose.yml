@@ -1,13 +1,30 @@
 services:
   postgres:
+    image: pgvector/pgvector:pg16
+    container_name: beca_database
+    restart: always
+    env_file:
+      - .env.db
+    volumes:
+      - ./instance/postgres_data:/var/lib/postgresql/data
+      - ./include/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: [ 'CMD-SHELL', 'pg_isready -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB}' ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  n8n_postgres:
     image: postgres:15-alpine
-    container_name: n8n_database
+    container_name: beca_n8n_database
     restart: always
     env_file:
       - .env
     volumes:
-      - ./instance/postgres_data:/var/lib/postgresql/data
-      - ./include/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./instance/n8n_postgres_data:/var/lib/postgresql/data
+      # - ./include/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
     healthcheck:
@@ -15,10 +32,9 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-
   n8n:
     image: n8nio/n8n:1.120.2
-    container_name: n8n_server
+    container_name: beca_n8n_server
     user: "node"
     ports:
       - "5678:5678"
@@ -31,7 +47,7 @@ services:
       - ./include/uploads:/home/node/uploads
     working_dir: /home/node/.n8n
     depends_on:
-      postgres:
+      n8n_postgres:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
@@ -44,7 +60,7 @@ services:
 
   ollama:
     image: ollama/ollama:0.12.11
-    container_name: n8n_ollama
+    container_name: beca_ollama
     ports:
       - "11434:11434"
     volumes:
@@ -61,7 +77,7 @@ services:
 
   ollama_fallback:
     image: ollama/ollama:0.12.11
-    container_name: n8n_ollama_fallback
+    container_name: beca_ollama_fallback
     ports:
       - "11435:11434"
     volumes:
@@ -78,6 +94,7 @@ services:
 
 volumes:
   postgres_data:
+  n8n_postgres_data:
   n8n_data:
   ollama:
   ollama_fallback:

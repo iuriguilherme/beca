@@ -1,0 +1,636 @@
+{
+  "name": "asserting_step_v1",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -32,
+        104
+      ],
+      "id": "93b23947-fbfb-4424-a7ef-e65a62c46094",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4f42fe6e-0843-4360-afad-43e47faf8349",
+              "leftValue": "={{ $json.sessionId }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        864,
+        104
+      ],
+      "id": "88eb1d83-e4f0-4083-85a1-8990ce155bfa",
+      "name": "Assert sessionId"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "746eebfc-cd4b-4c24-bb74-75df5aa83651",
+              "name": "sessionId",
+              "value": "={{ Math.floor(Math.random() * 1e15) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1088,
+        176
+      ],
+      "id": "227224d8-f982-48dc-9195-1bd8b2a7ff4c",
+      "name": "Append sessionId"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "aacc9116-3a0e-4bfc-bc81-f25856ede866",
+              "leftValue": "={{ $json.chatInput }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1312,
+        104
+      ],
+      "id": "545d1fe3-2d7e-4edc-9c6a-5ff3f2d8f679",
+      "name": "Detect Chat Input"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9caaa8d1-22ee-41a4-9915-fa50ceef0338",
+              "name": "prompt",
+              "value": "={{ $json.chatInput }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1536,
+        32
+      ],
+      "id": "5a522fcb-2ef7-4622-b364-096aa625c68a",
+      "name": "Parse Chat Input"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c98f6e1f-58d5-4e1d-b2f1-2cc31c935d8a",
+              "leftValue": "={{ $json.prompt }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1760,
+        104
+      ],
+      "id": "2d033d7a-9d00-4ec4-a7b1-6e82d0bfe608",
+      "name": "Assert Prompt"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9d55a060-389a-4280-96da-d437aea3fb09",
+              "name": "prompt",
+              "value": "=Ignore this",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1984,
+        176
+      ],
+      "id": "49cfac03-bb76-4965-8d35-0202b513fd2a",
+      "name": "Inject Prompt"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6fa21d07-4149-48f9-9351-76dc1cc8c1ad",
+              "leftValue": "={{ $json.context }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2208,
+        104
+      ],
+      "id": "86e1b761-4237-47ce-b7a2-4c07cd4a2c3a",
+      "name": "Assert context"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5ebdb1ee-604a-413e-94ff-083677cd32bb",
+              "name": "context",
+              "value": "None",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2432,
+        176
+      ],
+      "id": "f4fa73da-2f1c-4252-99e3-01e95fd57fd3",
+      "name": "Inject context"
+    },
+    {
+      "parameters": {
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3328,
+        104
+      ],
+      "id": "11281a60-24ff-437c-84c9-19f4de953f8a",
+      "name": "Return"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        192,
+        104
+      ],
+      "id": "46297bd2-0935-4e62-9e26-9948adda6d29",
+      "name": "Start"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "611c3e96-b243-4d30-a480-7eb2067c752e",
+              "leftValue": "={{ $json.model }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        104
+      ],
+      "id": "643388af-0f14-415c-8f0e-7a4ac1bd928b",
+      "name": "Assert model"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f2c176cb-1e61-466d-8c09-3a6da8fd59be",
+              "name": "model",
+              "value": "=llama3.2",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        640,
+        176
+      ],
+      "id": "3c1447b9-d69d-4be8-8d78-214fc14d4899",
+      "name": "Inject Model"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3104,
+        104
+      ],
+      "id": "e017768a-2917-4bf5-838a-1aeed6048463",
+      "name": "End"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c3844c61-87c8-4651-a1a5-d5850c39e631",
+              "leftValue": "systemPrompt",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2656,
+        104
+      ],
+      "id": "66aebb58-b9d0-476a-8fbd-c4cda0349ba9",
+      "name": "Assert System Prompt"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "603ff8cd-af6d-4e4a-b20f-80ab49cb211d",
+              "name": "systemPrompt",
+              "value": "You are a prompt generator",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2880,
+        176
+      ],
+      "id": "936a7c22-8ef7-44d8-86e4-12cfcb61d7e4",
+      "name": "Inject System Prompt"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Start",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assert sessionId": {
+      "main": [
+        [
+          {
+            "node": "Detect Chat Input",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append sessionId",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append sessionId": {
+      "main": [
+        [
+          {
+            "node": "Detect Chat Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect Chat Input": {
+      "main": [
+        [
+          {
+            "node": "Parse Chat Input",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Assert Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Chat Input": {
+      "main": [
+        [
+          {
+            "node": "Assert Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assert Prompt": {
+      "main": [
+        [
+          {
+            "node": "Assert context",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Inject Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inject Prompt": {
+      "main": [
+        [
+          {
+            "node": "Assert context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assert context": {
+      "main": [
+        [
+          {
+            "node": "Assert System Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Inject context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inject context": {
+      "main": [
+        [
+          {
+            "node": "Assert System Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Assert model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assert model": {
+      "main": [
+        [
+          {
+            "node": "Assert sessionId",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Inject Model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inject Model": {
+      "main": [
+        [
+          {
+            "node": "Assert sessionId",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "End": {
+      "main": [
+        [
+          {
+            "node": "Return",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assert System Prompt": {
+      "main": [
+        [
+          {
+            "node": "End",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Inject System Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inject System Prompt": {
+      "main": [
+        [
+          {
+            "node": "End",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cc801d0c-99ce-497f-a5fe-0cfda2b6fa67",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5477294f5d3a06ea145a32cfe84f2a422eac233f472a30914283db00ed658afe"
+  },
+  "id": "xn9V9henO2ZXcvom",
+  "tags": [
+    {
+      "updatedAt": "2025-11-30T20:56:33.087Z",
+      "createdAt": "2025-11-30T20:56:33.087Z",
+      "id": "yvZJPTtKvYrUjXfA",
+      "name": "level1"
+    }
+  ]
+}

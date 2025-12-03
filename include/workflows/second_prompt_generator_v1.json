@@ -1,0 +1,327 @@
+{
+  "name": "second_prompt_generator_v1",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        16,
+        112
+      ],
+      "id": "4065b423-9c67-4374-a010-dffe596cde7c",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.userPrompt }}",
+        "options": {
+          "systemMessage": "={{ $json.systemPrompt }}"
+        }
+      },
+      "id": "622fe7eb-be1a-4418-831a-8c282fd88a55",
+      "name": "Secondary AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        464,
+        16
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "model": "={{ $json.model }}",
+        "options": {}
+      },
+      "id": "183d65bd-80f2-4b10-8881-a216fbc086cd",
+      "name": "Ollama Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        472,
+        240
+      ],
+      "credentials": {
+        "ollamaApi": {
+          "id": "Vy8Zgbfd9ejDpvxs",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.sessionId }}"
+      },
+      "id": "90d3b2eb-5b1d-43c4-9e26-fa444f775aad",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        600,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1040,
+        -80
+      ],
+      "id": "a70d80b7-c3ea-4064-a6eb-10b168dc2216",
+      "name": "Return"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        -80
+      ],
+      "id": "d7782cbb-e1fb-493c-9ceb-9379e2749942",
+      "name": "When clicking 'Execute workflow'"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1b2c3d4-0001-0001-0001-000000000001",
+              "name": "model",
+              "value": "qwen2.5:3b",
+              "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-0002-0002-0002-000000000002",
+              "name": "systemPrompt",
+              "value": "You are a helpful Python programming assistant. Provide clear, concise, and accurate answers about Python programming. When explaining code, break it down step by step. Always follow best practices and modern Python conventions.",
+              "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-0003-0003-0003-000000000003",
+              "name": "userPrompt",
+              "value": "How do I package a Python module?",
+              "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-0004-0004-0004-000000000004",
+              "name": "sessionId",
+              "value": "={{ Math.floor(Math.random() * 1e15) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        16,
+        -80
+      ],
+      "id": "352cac81-0c37-4587-afd0-47858814b2af",
+      "name": "Example Input"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1b2c3d4-0005-0005-0005-000000000005",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        816,
+        112
+      ],
+      "id": "c5e0ebd2-71c9-415d-8681-9956fac1f610",
+      "name": "Error"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1b2c3d4-0006-0006-0006-000000000006",
+              "name": "success",
+              "value": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        816,
+        -80
+      ],
+      "id": "b0106516-19d5-4824-b2c6-826deb64af12",
+      "name": "Success"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        240,
+        16
+      ],
+      "id": "a827bc0c-0c0f-4e14-8681-8f75e4dbc5b6",
+      "name": "Start"
+    },
+    {
+      "parameters": {
+        "errorMessage": "={{ $json.error }}"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        112
+      ],
+      "id": "63608d0f-ee6a-4440-bc7e-c87ec4348cec",
+      "name": "Stop and Error"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Start",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Secondary AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Secondary AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Secondary AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking 'Execute workflow'": {
+      "main": [
+        [
+          {
+            "node": "Example Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Example Input": {
+      "main": [
+        [
+          {
+            "node": "Start",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Success": {
+      "main": [
+        [
+          {
+            "node": "Return",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Secondary AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0f443cbd-53ea-4c57-9f24-a9a745be0365",
+  "meta": {
+    "instanceId": "5477294f5d3a06ea145a32cfe84f2a422eac233f472a30914283db00ed658afe"
+  },
+  "id": "2upP7YeQ0P1Yv93h",
+  "tags": []
+}
