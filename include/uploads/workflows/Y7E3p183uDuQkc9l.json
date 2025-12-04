@@ -1,0 +1,395 @@
+{
+  "updatedAt": "2025-12-03T18:34:50.415Z",
+  "createdAt": "2025-12-03T18:24:21.668Z",
+  "id": "Y7E3p183uDuQkc9l",
+  "name": "embedding_step_v1",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        112
+      ],
+      "id": "6dc44b39-8f62-4460-83a8-981bafd4abbc",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -80
+      ],
+      "id": "b701e007-620b-49ab-a0d0-4f43a1281e3e",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8ce154ab-4401-4f53-a653-c96f5d5b039c",
+              "name": "prompt",
+              "value": "Packaging a Python module involves several steps to make your code ready for distribution on platforms like PyPI (Python Package Index). Below is a step-by-step guide using `setuptools` as the primary tool for packaging. This process includes creating a setup script, building and installing your package.  ### Step 1: Create a `setup.py` file The `setup.py` file is where you declare various attributes about your Python project. The following example assumes that your module will be installed using pip.  ```python from setuptools import setup, find_packages  # Metadata setup(     name='your_package_name',     version='0.1',     author='Your Name',     description='A brief description of the package',     packages=find_packages(),  # Automatically finds all packages in your project     install_requires=[],       # Packages required by your module (if any)     python_requires='>=3.6',   # Python version requirement ) ```  ### Step 2: Install `setuptools` and `wheel` Ensure you have the necessary tools installed to create a distribution package of your application.  ```bash pip install setuptools wheel ```  ### Step 3: Build your project for distribution You can build your package into an Sdist (source tarball) using:  ```bash python setup.py sdist --formats gztar ```  This command will generate an archive file (e.g., `your_package_name-0.1.tar.gz`) in the directory where you run this command.  ### Step 4: Create a wheel distribution A wheel is a binary distribution package format, which can be installed directly using pip without needing to compile source code.  ```bash python setup.py bdist_wheel --universal ```  This will generate `your_package_name-0.1-py3-none-any.whl` and additional files in the build directory.  ### Step 5: Distribute your package Your wheel file can now be uploaded to PyPI or shared with others via Git repositories, etc.  For uploading to PyPI:  ```bash python -m twine upload dist/* ```  You will need a PyPI account and follow the instructions provided by `twine` for authentication. After completing this step, your package will be available on PyPI for installation using pip.  ### Additional Considerations  - **Dependencies**: If your project relies on other libraries (e.g., requests, pandas), include their names in `install_requires`.    - **Tests**: Consider writing tests with tools like `pytest` to ensure that your code works correctly. You might want to run these during the installation process.  ```python # Adding test dependencies for pip install. setup(     ...     tests_require=['pytest'], ) ```  - **Documentation**: Use Sphinx or other documentation generators to create a README.md and install instructions, which can be very helpful for others who use your package. You can build these using:  ```bash pip install sphinx cd docs make html  # Assuming you have a `conf.py` file in the root of your project ```  This will generate HTML documentation files that can be served online.  By following these steps, you'll be able to create a well-structured and ready-to-distribute Python package.",
+              "type": "string"
+            },
+            {
+              "id": "a246e9fa-e01e-49c8-9e34-1ce6653f6a28",
+              "name": "model",
+              "value": "embeddinggemma:300m",
+              "type": "string"
+            },
+            {
+              "id": "07e9b485-c31e-4ee1-943c-46555891f0d0",
+              "name": "sessionId",
+              "value": "={{ Math.floor(Math.random() * 1e15) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        -80
+      ],
+      "id": "86ef5e4d-4c00-4db5-aeba-37304ef951a9",
+      "name": "Example input"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        448,
+        16
+      ],
+      "id": "d0037d1d-0995-403f-b8ff-31dafb50bd93",
+      "name": "Start"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}",
+        "needsFallback": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        728,
+        16
+      ],
+      "id": "5954d6df-7768-4cb6-9b1d-03cb661f9641",
+      "name": "AI Agent",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b539cff7-72ad-4b95-8890-6a91c273dc3c",
+              "name": "success",
+              "value": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1136,
+        -80
+      ],
+      "id": "ca8ae343-93a9-4151-a1cb-aef4815309f1",
+      "name": "Success"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b539cff7-72ad-4b95-8890-6a91c273dc3c",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1136,
+        112
+      ],
+      "id": "2e70e499-a1be-46dd-ba94-2f89dc33fa1c",
+      "name": "Error"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        -80
+      ],
+      "id": "9adce9ac-b87d-462c-90a9-9b3280823f2d",
+      "name": "End"
+    },
+    {
+      "parameters": {
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1584,
+        -80
+      ],
+      "id": "eb243e2e-89fb-43db-8673-cdc47e7adc94",
+      "name": "Return"
+    },
+    {
+      "parameters": {
+        "errorMessage": "={{ $json.error }}"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        112
+      ],
+      "id": "90dfd3f8-2420-4d0c-9572-672d2d2066dc",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "model": "={{ $json.model }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        672,
+        240
+      ],
+      "id": "0e3c7891-1e8f-4c9f-bca7-ee01f53d5035",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "Vy8Zgbfd9ejDpvxs",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        800,
+        240
+      ],
+      "id": "bed4f258-888e-4d93-89f3-b7b21049aa48",
+      "name": "Ollama Chat Model1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "tnDt6bOwmuJLwBLY",
+          "name": "Ollama account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        928,
+        240
+      ],
+      "id": "96432752-9da3-41b4-bbb8-35d1d466ca30",
+      "name": "Simple Memory"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Example input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Example input": {
+      "main": [
+        [
+          {
+            "node": "Start",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Start",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Success": {
+      "main": [
+        [
+          {
+            "node": "End",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "End": {
+      "main": [
+        [
+          {
+            "node": "Return",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "2c14e0e9-8486-4e73-b987-9e0df8d9bb59",
+  "versionCounter": 3,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2025-12-03T18:24:21.668Z",
+      "createdAt": "2025-12-03T18:24:21.668Z",
+      "role": "workflow:owner",
+      "workflowId": "Y7E3p183uDuQkc9l",
+      "projectId": "YTOrz7CHLJRvD6yM",
+      "project": {
+        "updatedAt": "2025-11-30T20:40:47.978Z",
+        "createdAt": "2025-11-30T20:39:31.365Z",
+        "id": "YTOrz7CHLJRvD6yM",
+        "name": "Iuri Guilherme <aindatenhoconta@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

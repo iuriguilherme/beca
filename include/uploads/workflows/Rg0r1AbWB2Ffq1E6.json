@@ -1,0 +1,178 @@
+{
+  "updatedAt": "2025-11-30T22:35:42.118Z",
+  "createdAt": "2025-11-30T22:35:42.118Z",
+  "id": "Rg0r1AbWB2Ffq1E6",
+  "name": "Meta Prompt Generator - Test",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        -16
+      ],
+      "id": "4990672f-9187-4f1c-82a3-5f88251fdefa",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        688,
+        -16
+      ],
+      "id": "c0c33d78-3077-4782-ba1f-a6f89d4f24b2",
+      "name": "Return"
+    },
+    {
+      "parameters": {},
+      "id": "68985125-46cb-4e81-bae8-bed8ea798c87",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        480,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Fake Input Data').item.json.sessionId }}"
+      },
+      "id": "59f37233-f2ef-48ff-94e7-270daca42c8e",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        352,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "model": "={{ $('Fake Input Data').item.json.model }}",
+        "options": {}
+      },
+      "id": "886302c2-3fbe-4b39-8b5e-4019fe1f1a4f",
+      "name": "Ollama Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        224,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.prompt }}\n\n{{ $json.context !== 'None' ? 'Additional Context: ' + $json.context : '' }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "={{ $('Read System Prompt').item.json.content }}"
+        }
+      },
+      "id": "0620d046-e261-4df4-b439-24734c95551d",
+      "name": "Prompt Engineer Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        280,
+        -16
+      ]
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Prompt Engineer Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Prompt Engineer Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Prompt Engineer Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Prompt Engineer Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prompt Engineer Agent": {
+      "main": [
+        [
+          {
+            "node": "Return",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "9054f733-a304-448c-b4e8-3791e56d19a1",
+  "versionCounter": 1,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2025-11-30T22:35:42.118Z",
+      "createdAt": "2025-11-30T22:35:42.118Z",
+      "role": "workflow:owner",
+      "workflowId": "Rg0r1AbWB2Ffq1E6",
+      "projectId": "YTOrz7CHLJRvD6yM",
+      "project": {
+        "updatedAt": "2025-11-30T20:40:47.978Z",
+        "createdAt": "2025-11-30T20:39:31.365Z",
+        "id": "YTOrz7CHLJRvD6yM",
+        "name": "Iuri Guilherme <aindatenhoconta@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

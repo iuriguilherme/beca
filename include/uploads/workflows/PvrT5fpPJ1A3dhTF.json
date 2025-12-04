@@ -1,0 +1,339 @@
+{
+  "updatedAt": "2025-11-30T22:37:28.384Z",
+  "createdAt": "2025-11-30T22:32:48.429Z",
+  "id": "PvrT5fpPJ1A3dhTF",
+  "name": "Meta Prompt Generator",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -464,
+        -80
+      ],
+      "id": "559d7c0a-6b88-4c3b-a97c-24850f901f6e",
+      "name": "When Executed by Another Workflow",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User Prompt: {{ $json.prompt }}\n\n{{ $json.context !== 'None' ? 'Additional Context: ' + $json.context : '' }}\n\nTarget Model: {{ $json.model }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a Prompt Engineer AI. Your job is to create effective system prompts for another AI agent.\n\n## Your Task\n\nTransform the user's request into a clear, optimized system prompt for the target AI model.\n\n## Guidelines\n\n1. **Be Clear and Direct**\n   - Start with a clear role definition for the secondary agent\n   - Use precise, actionable language\n   - Break complex tasks into numbered steps\n   - Make instructions self-contained\n\n2. **Include Essential Context**\n   - Incorporate relevant background from the user's prompt\n   - Include the context information when it's not \"None\"\n   - Don't overwhelm with unnecessary details\n   - Focus on what the secondary agent needs to know\n\n3. **Structure for Success**\n   - Define clear objectives\n   - Specify output format when needed\n   - Set appropriate constraints and boundaries\n   - Include examples when they would be helpful\n   - Use formatting the model handles well\n\n4. **Optimize for Target Model**\n   - Match prompt style to the model's capabilities\n   - Keep instructions focused and concise\n   - Consider the model's strengths and limitations\n   - Use structure that aids comprehension\n\n## What to Provide\n\nFor each prompt transformation, you must generate:\n\n1. **systemPrompt**: The complete system prompt that will be given to the secondary AI agent\n2. **userIntent**: A brief description of what the user is trying to accomplish\n3. **keyRequirements**: A list of the critical requirements for the task (3-5 items)\n4. **optimizationNotes**: Explanation of how you optimized this prompt for the target model\n\n## Important Rules\n\n- Always preserve the user's original intent completely\n- Include context information when it's provided\n- Make prompts self-contained and clear\n- Consider what output format would best serve the user's needs\n- Optimize your language and structure for the target model specified"
+        }
+      },
+      "id": "d6754646-7fe7-4ca3-b05d-4d194f6cbc91",
+      "name": "Prompt Engineer Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        40,
+        -176
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "model": "llama3.2:1b",
+        "options": {}
+      },
+      "id": "7d5d481f-f208-4fd7-895b-98a55154771f",
+      "name": "Ollama Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        48
+      ],
+      "credentials": {
+        "ollamaApi": {
+          "id": "Vy8Zgbfd9ejDpvxs",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.sessionId }}"
+      },
+      "id": "2ea974dc-4ad8-4f83-bf70-547f9f72574c",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        112,
+        48
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "baa89d2f-e302-4857-b4da-640689d63a90",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        240,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        -176
+      ],
+      "id": "2881c4f5-1f88-457c-b8e3-e6e4ffef8b57",
+      "name": "Return"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -464,
+        -272
+      ],
+      "id": "89d4b003-f768-487a-989b-723a1e6e11c0",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9340ba64-fb11-4650-8899-dd035ca7a8ce",
+              "name": "model",
+              "value": "llama3.2:1b",
+              "type": "string"
+            },
+            {
+              "id": "aae1e9a7-ab58-4f82-8284-723eecf307ac",
+              "name": "prompt",
+              "value": "how to package a python module",
+              "type": "string"
+            },
+            {
+              "id": "d534f635-9dcc-4076-aaa3-2fef8c6b6173",
+              "name": "context",
+              "value": "None",
+              "type": "string"
+            },
+            {
+              "id": "92a5aa82-6066-4aa2-ac1f-b3f36dff02e7",
+              "name": "sessionId",
+              "value": "={{ Math.floor(Math.random() * 1e15) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -240,
+        -176
+      ],
+      "id": "22568ef9-3b39-4f4b-bb6d-846ef1cc09ce",
+      "name": "Example Input"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5da3db01-8500-4422-832d-d7d1adbea485",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        -80
+      ],
+      "id": "761503d5-aa04-451f-aa8d-52fc630bcaa6",
+      "name": "Error"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "498484c3-b469-43f1-88ef-f3a78d9f018f",
+              "name": "success",
+              "value": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        -272
+      ],
+      "id": "61a0368b-bdb1-44d2-8cff-48973690db9c",
+      "name": "Success"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Example Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prompt Engineer Agent": {
+      "main": [
+        [
+          {
+            "node": "Success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Prompt Engineer Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Prompt Engineer Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Prompt Engineer Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Example Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Example Input": {
+      "main": [
+        [
+          {
+            "node": "Prompt Engineer Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Success": {
+      "main": [
+        [
+          {
+            "node": "Return",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error": {
+      "main": [
+        [
+          {
+            "node": "Return",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "c53ea920-d969-4d50-b700-8096e0468b40",
+  "versionCounter": 2,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2025-11-30T22:32:48.429Z",
+      "createdAt": "2025-11-30T22:32:48.429Z",
+      "role": "workflow:owner",
+      "workflowId": "PvrT5fpPJ1A3dhTF",
+      "projectId": "YTOrz7CHLJRvD6yM",
+      "project": {
+        "updatedAt": "2025-11-30T20:40:47.978Z",
+        "createdAt": "2025-11-30T20:39:31.365Z",
+        "id": "YTOrz7CHLJRvD6yM",
+        "name": "Iuri Guilherme <aindatenhoconta@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

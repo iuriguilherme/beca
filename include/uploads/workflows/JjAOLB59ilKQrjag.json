@@ -1,0 +1,324 @@
+{
+  "updatedAt": "2025-11-30T22:11:36.633Z",
+  "createdAt": "2025-11-30T21:32:57.509Z",
+  "id": "JjAOLB59ilKQrjag",
+  "name": "first_prompt_generator_v1",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -32,
+        416
+      ],
+      "id": "13daaa0a-23c5-4f58-bb5e-028f34505882",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}",
+        "hasOutputParser": true,
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "={{ $json.system_prompt }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        472,
+        416
+      ],
+      "id": "f29ac431-80cb-4e2d-93a7-4ac8f7e60bd2",
+      "name": "AI Agent",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "defb246d-a488-4a34-8453-639d8ca65750",
+              "name": "success",
+              "value": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        320
+      ],
+      "id": "74480857-9a20-4d72-a34b-14b480984ebb",
+      "name": "Sucess"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "500aa0d7-bf6e-4859-83e9-970123c39de3",
+              "name": "succes",
+              "value": false,
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        512
+      ],
+      "id": "883b4e73-39aa-442e-9f2a-0bbb984bc671",
+      "name": "Error"
+    },
+    {
+      "parameters": {
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1328,
+        416
+      ],
+      "id": "23b10b64-2327-4c39-aeb4-4bcb589d7848",
+      "name": "Return"
+    },
+    {
+      "parameters": {
+        "model": "llama3.2:1b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        416,
+        640
+      ],
+      "id": "c8807751-581a-4ec1-9e7f-4658f8af52ae",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "Vy8Zgbfd9ejDpvxs",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama3.2:1b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        544,
+        640
+      ],
+      "id": "0aab5d40-9a1f-4a10-aec3-429aa04bd3d9",
+      "name": "Ollama Chat Model1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "tnDt6bOwmuJLwBLY",
+          "name": "Ollama account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        672,
+        640
+      ],
+      "id": "383d2710-2baa-4746-bfa0-c9b49c076373",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        192,
+        416
+      ],
+      "id": "4641e8b5-8b16-49f6-b0d0-9943dddd7275",
+      "name": "Start"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        416
+      ],
+      "id": "dba91f8c-8f83-49e0-80d7-fe53bc4b821b",
+      "name": "End"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Start",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Sucess",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sucess": {
+      "main": [
+        [
+          {
+            "node": "End",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error": {
+      "main": [
+        [
+          {
+            "node": "End",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "End": {
+      "main": [
+        [
+          {
+            "node": "Return",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "e5be6907-93fc-47db-9e94-c99bd3f982f4",
+  "versionCounter": 15,
+  "triggerCount": 0,
+  "tags": [
+    {
+      "updatedAt": "2025-11-30T21:32:53.614Z",
+      "createdAt": "2025-11-30T21:32:53.614Z",
+      "id": "6U6qptHGr1glwU73",
+      "name": "level2"
+    }
+  ],
+  "shared": [
+    {
+      "updatedAt": "2025-11-30T21:32:57.509Z",
+      "createdAt": "2025-11-30T21:32:57.509Z",
+      "role": "workflow:owner",
+      "workflowId": "JjAOLB59ilKQrjag",
+      "projectId": "YTOrz7CHLJRvD6yM",
+      "project": {
+        "updatedAt": "2025-11-30T20:40:47.978Z",
+        "createdAt": "2025-11-30T20:39:31.365Z",
+        "id": "YTOrz7CHLJRvD6yM",
+        "name": "Iuri Guilherme <aindatenhoconta@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}
