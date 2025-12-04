@@ -70,17 +70,20 @@ This two-stage approach enables:
 
 ### Core Services
 
-- **n8n** (1.120.2): Workflow orchestration and agent coordination
-- **PostgreSQL** (16 + pgvector): Prompt storage with vector similarity search
-- **Ollama** (0.12.11): Local LLM inference (GPU-accelerated)
+- **n8n** (1.122.5): Workflow orchestration and agent coordination
+- **PostgreSQL** (18 + pgvector): Prompt storage with vector similarity search
+- **Ollama** (0.13.1): Local LLM inference (GPU-accelerated)
 - **Docker Compose**: Container orchestration
 
-### n8n Workflows (4 total)
+### n8n Workflows (7 total)
 
-1. **orchestrator_v1**: Main entry point, defines model and system prompts
-2. **asserting_step_v1**: Validates inputs and injects defaults
-3. **first_prompt_generator_v2**: Meta-prompting agent with structured output
-4. **second_prompt_generator_v1**: Task execution agent with free-form output
+1. **orchestrator_v3**: Main entry point and workflow coordinator
+2. **fetch_data_v3**: Loads configuration from `config.json` and `meta_prompt.md`
+3. **asserting_step_v3**: Validates inputs and injects defaults
+4. **first_prompt_generator_v3**: Meta-prompting agent with structured output
+5. **second_prompt_generator_v3**: Task execution agent
+6. **embedding_step_v3**: Generates 768-dimensional embeddings using embeddinggemma
+7. **persistence_step_v3**: Stores prompts and embeddings in PostgreSQL
 
 ### Database Features
 
@@ -92,7 +95,9 @@ This two-stage approach enables:
 
 ### AI Models
 
-- Primary: **qwen2.5:3b** (good structured output, balanced performance)
+- Primary: **qwen2.5:latest** (good structured output, balanced performance)
+- Fallback: **llama3.2:latest** (lighter model for simpler tasks)
+- Embedding: **embeddinggemma:latest** (768-dimensional vectors)
 - Fallback Ollama instance available on port 11435
 - Window buffer memory for conversation continuity
 
@@ -126,9 +131,11 @@ This two-stage approach enables:
    docker-compose up -d
    ```
 
-4. **Pull LLM model**
+4. **Pull LLM models**
    ```bash
-   docker exec -it beca_ollama ollama pull qwen2.5:3b
+   docker exec -it beca_ollama ollama pull qwen2.5:latest
+   docker exec -it beca_ollama ollama pull llama3.2:latest
+   docker exec -it beca_ollama ollama pull embeddinggemma:latest
    ```
 
 5. **Access n8n**
@@ -137,7 +144,7 @@ This two-stage approach enables:
    - Workflows auto-load from `./include/workflows/`
 
 6. **Test the system**
-   - Open `orchestrator_v1` workflow
+   - Open `orchestrator_v3` workflow
    - Click "Execute workflow"
    - Check the output
 
@@ -154,7 +161,7 @@ This two-stage approach enables:
 ### Via n8n UI
 
 1. Navigate to http://localhost:5678
-2. Open the `orchestrator_v1` workflow
+2. Open the `orchestrator_v3` workflow
 3. Modify the Example Input node with your prompt
 4. Click "Execute workflow"
 5. View results in the Return node
@@ -182,19 +189,31 @@ curl -X POST http://localhost:5678/webhook/<workflow-id> \
 ## Data Flow
 
 ```
-Input: { prompt, context?, model?, sessionId? }
+Input: { user_prompt, context? }
+  ↓
+Fetch Data (loads config.json + meta_prompt.md)
+  ↓
+{ model_first, model_second, model_embedding, system_prompt_first }
   ↓
 Asserting Step (validates + defaults)
   ↓
-{ model, prompt, context, sessionId, systemPrompt }
+{ sessionId, user_prompt, context, model_*, system_prompt_first }
   ↓
 First Generator (meta-prompting)
   ↓
-{ systemPrompt, userIntent, keyRequirements, optimizationNotes }
+{ system_prompt_second, user_intent, key_requirements, optimization_notes }
   ↓
 Second Generator (execution)
   ↓
-{ output: "final response", success: true }
+{ output: "final response" }
+  ↓
+Embedding Step (generate vector)
+  ↓
+{ embedding: [768 floats] }
+  ↓
+Persistence Step (store in DB)
+  ↓
+{ success: true, id: uuid }
 ```
 
 ## Project Structure
@@ -206,13 +225,14 @@ beca/
 ├── .env.db                  # Database credentials
 ├── include/
 │   ├── init.sql            # Database schema + genesis prompt
-│   ├── workflows/          # n8n workflow JSON files
-│   │   ├── orchestrator_v1.json
-│   │   ├── asserting_step_v1.json
-│   │   ├── first_prompt_generator_v2.json
-│   │   ├── second_prompt_generator_v1.json
-│   │   ├── embedding_step_v2.json
-│   │   └── persistence_step_v2.json
+│   ├── workflows/          # n8n workflow JSON files (v3)
+│   │   ├── orchestrator_v3.json
+│   │   ├── fetch_data_v3.json
+│   │   ├── asserting_step_v3.json
+│   │   ├── first_prompt_generator_v3.json
+│   │   ├── second_prompt_generator_v3.json
+│   │   ├── embedding_step_v3.json
+│   │   └── persistence_step_v3.json
 │   ├── prompts/            # System prompts (future)
 │   ├── custom/             # Custom n8n nodes
 │   └── uploads/            # File storage

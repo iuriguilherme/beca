@@ -6,47 +6,54 @@ BECA (Best Agent Evolve) is a meta-prompting AI system using n8n workflows, Post
 
 ## Architecture
 
-The system uses a **five-workflow orchestration pattern**:
+The system uses a **seven-workflow orchestration pattern**:
 
-1. **Orchestrator** (`orchestrator_v1`) - Main workflow coordinating the entire process
-2. **Asserting Step** (`asserting_step_v1`) - Input validation and normalization
-3. **First Prompt Generator** (`first_prompt_generator_v2`) - Meta-prompting agent
-4. **Second Prompt Generator** (`second_prompt_generator_v1`) - Task executor agent
-5. **Embedding Step** (`embedding_step_v2`) - Vector embedding generation
-6. **Persistence Step** (`persistence_step_v2`) - Database storage
+1. **Orchestrator** (`orchestrator_v3`) - Main workflow coordinating the entire process
+2. **Fetch Data** (`fetch_data_v3`) - Loads configuration from files (`config.json` and `meta_prompt.md`)
+3. **Asserting Step** (`asserting_step_v3`) - Input validation and normalization
+4. **First Prompt Generator** (`first_prompt_generator_v3`) - Meta-prompting agent
+5. **Second Prompt Generator** (`second_prompt_generator_v3`) - Task executor agent
+6. **Embedding Step** (`embedding_step_v3`) - Vector embedding generation
+7. **Persistence Step** (`persistence_step_v3`) - Database storage
 
 ### Data Flow
 
 ```
 User Input/Chat/Schedule/External Trigger
     ↓
-[orchestrator_v1]
-    ↓ Define Model (qwen2.5:3b)
-    ↓ Define System Prompt (Prompt Engineer instructions)
+[orchestrator_v3]
+    ↓ (calls fetch_data_v3)
     ↓
-[asserting_step_v1] - Validates and injects defaults:
-    • model (default: llama3.2)
+[fetch_data_v3] - Loads configuration:
+    • Reads config.json (model settings)
+    • Reads meta_prompt.md (system prompt template)
+    • Returns: model_first, model_second, model_embedding, system_prompt_first
+    ↓
+[asserting_step_v3] - Validates and injects defaults:
+    • model_first (default: llama3.2:latest)
+    • model_second (default: llama3.2:latest) 
+    • model_embedding (default: embeddinggemma:latest)
     • sessionId (generates if missing)
-    • prompt (detects chatInput, default: "Ignore this")
+    • user_prompt (detects chatInput, default: "Ignore this")
     • context (default: "None")
-    • systemPrompt (default: "You are a prompt generator")
+    • system_prompt_first (default: "You are a prompt generator")
     ↓
-[first_prompt_generator_v2] - Meta-prompter agent:
-    • Receives user prompt and context
-    • Generates optimized systemPrompt for secondary agent
-    • Returns: systemPrompt, userIntent, keyRequirements, optimizationNotes
+[first_prompt_generator_v3] - Meta-prompter agent:
+    • Receives user_prompt and context
+    • Generates optimized system_prompt_second for secondary agent
+    • Returns: system_prompt_second, user_intent, key_requirements, optimization_notes
     ↓
-[second_prompt_generator_v1] - Task executor:
-    • Uses generated systemPrompt
+[second_prompt_generator_v3] - Task executor:
+    • Uses generated system_prompt_second
     • Executes actual user request
     • Returns response
     ↓
-[embedding_step_v2] - Embedding generator:
+[embedding_step_v3] - Embedding generator:
     • Generates 768-dimensional vector from prompt
     • Uses embeddinggemma via Ollama
     • Formats for PostgreSQL vector storage
     ↓
-[persistence_step_v2] - Database storage:
+[persistence_step_v3] - Database storage:
     • Stores prompt and embedding in PostgreSQL
     • Uses pgvector for similarity search
 ```
@@ -69,12 +76,13 @@ beca/
 │   ├── init.sql               # PostgreSQL schema with pgvector
 │   ├── prompts/               # System prompts for agents
 │   ├── workflows/             # n8n workflow JSON files
-│   │   ├── orchestrator_v1.json
-│   │   ├── asserting_step_v1.json
-│   │   ├── first_prompt_generator_v2.json
-│   │   ├── second_prompt_generator_v1.json
-│   │   ├── embedding_step_v2.json
-│   │   └── persistence_step_v2.json
+│   │   ├── orchestrator_v3.json
+│   │   ├── fetch_data_v3.json
+│   │   ├── asserting_step_v3.json
+│   │   ├── first_prompt_generator_v3.json
+│   │   ├── second_prompt_generator_v3.json
+│   │   ├── embedding_step_v3.json
+│   │   └── persistence_step_v3.json
 │   ├── custom/                # Custom n8n nodes
 │   └── uploads/               # Upload storage
 ├── instance/                  # Runtime data (volumes)
@@ -87,7 +95,7 @@ beca/
 
 ## Workflows
 
-### orchestrator_v1
+### orchestrator_v3
 
 **Purpose**: Main entry point and orchestration hub
 
@@ -98,22 +106,44 @@ beca/
 - External workflow call
 
 **Process**:
-1. Defines model configuration (qwen2.5:3b)
-2. Defines system prompt for meta-prompting
-3. Calls Asserting Step → First Prompt Generator → Second Prompt Generator
-4. Returns final output
+1. Calls fetch_data_v3 to load configuration
+2. Calls Asserting Step → First Prompt Generator → Second Prompt Generator → Embedding Step → Persistence Step
+3. Returns final output
 
-### asserting_step_v1
+### fetch_data_v3
+
+**Purpose**: Configuration loader - reads settings from files
+
+**Process**:
+1. Reads `../uploads/config.json` for model configuration
+2. Reads `../uploads/meta_prompt.md` for system prompt template
+3. Extracts JSON from config file
+4. Extracts text from markdown file
+5. Merges and returns configuration data
+
+**Output**:
+```json
+{
+  "model_first": "qwen2.5:latest",
+  "model_second": "qwen2.5:latest",
+  "model_embedding": "embeddinggemma:latest",
+  "system_prompt_first": "<content from meta_prompt.md>"
+}
+```
+
+### asserting_step_v3
 
 **Purpose**: Input validation and default injection
 
 **Validates** (in order):
-1. `model` - Injects "llama3.2" if missing
-2. `sessionId` - Generates random ID if missing
-3. `chatInput` - Converts to `prompt` if present
-4. `prompt` - Injects "Ignore this" if missing
-5. `context` - Injects "None" if missing
-6. `systemPrompt` - Injects default if missing
+1. `model_first` - Injects "llama3.2:latest" if missing
+2. `model_second` - Injects "llama3.2:latest" if missing
+3. `model_embedding` - Injects "embeddinggemma:latest" if missing
+4. `sessionId` - Generates random ID if missing
+5. `chatInput` - Converts to `user_prompt` if present
+6. `user_prompt` - Injects "Ignore this" if missing
+7. `context` - Injects "None" if missing
+8. `system_prompt_first` - Injects default if missing
 
 **Pattern**: Each validation uses an IF node with two branches:
 - **True branch**: Value exists, continues
@@ -121,58 +151,61 @@ beca/
 
 This ensures all downstream workflows receive valid, normalized data.
 
-### first_prompt_generator_v2
+### first_prompt_generator_v3
 
 **Purpose**: Meta-prompting agent that generates optimized system prompts
 
 **Components**:
 - **Prompt Engineer Agent**: LangChain agent with structured output
-- **Ollama Chat Model**: Uses model from input (typically qwen2.5:3b)
+- **Ollama Chat Model**: Uses model_first from input (typically qwen2.5:latest)
 - **Window Buffer Memory**: Maintains conversation context per sessionId
 - **Structured Output Parser**: Enforces JSON schema output
 
 **Input Schema**:
 ```json
 {
-  "model": "string",
-  "prompt": "string",
-  "context": "string",
   "sessionId": "string",
-  "systemPrompt": "string"
+  "model_first": "string",
+  "model_second": "string",
+  "system_prompt_first": "string",
+  "user_prompt": "string",
+  "context": "string"
 }
 ```
 
 **Output Schema**:
 ```json
 {
-  "systemPrompt": "string",
-  "userIntent": "string",
-  "keyRequirements": "array<string>",
-  "optimizationNotes": "string",
+  "system_prompt_second": "string",
+  "user_intent": "string",
+  "key_requirements": ["string"],
+  "optimization_notes": "string",
   "success": "boolean"
 }
 ```
 
 **Error Handling**: Uses Success/Error nodes to track execution status
 
-### second_prompt_generator_v1
+### second_prompt_generator_v3
 
 **Purpose**: Task executor using optimized prompt from first agent
 
 **Components**:
 - **Secondary AI Agent**: LangChain agent (no output parser)
-- **Ollama Chat Model**: Uses model from orchestrator
+- **Ollama Chat Model**: Uses model_second from input
 - **Window Buffer Memory**: Maintains same sessionId context
 
 **Input Requirements**:
-- `model`: LLM model name
-- `userPrompt`: Original user request
-- `systemPrompt`: Optimized prompt from first agent
+- `model_second`: LLM model name
+- `user_intent`: Original user request
+- `system_prompt_second`: Optimized prompt from first agent
+- `key_requirements`: Task requirements
+- `optimization_notes`: Optimization notes
 - `sessionId`: Session tracking ID
 
 **Output**: Free-form response based on generated system prompt
 
-### embedding_step_v2
+### embedding_step_v3
 
 **Purpose**: Generate vector embeddings from prompts for similarity search
 
@@ -189,16 +222,15 @@ This ensures all downstream workflows receive valid, normalized data.
 5. Merges with original input data
 6. Passes to persistence workflow
 
-**Model**: `embeddinggemma`
+**Model**: `embeddinggemma:latest`
 - Produces 768-dimensional vectors
 - Good quality for semantic similarity
-- Note: Model may be specified as "embeddinggemma:300m" but outputs 768 dimensions
 
 **Input**:
 ```json
 {
   "prompt": "string",
-  "embeddingModel": "embeddinggemma:300m",
+  "model_embedding": "embeddinggemma:latest",
   "sessionId": "string"
 }
 ```
@@ -215,24 +247,24 @@ This ensures all downstream workflows receive valid, normalized data.
 }
 ```
 
-### persistence_step_v2
+### persistence_step_v3
 
 **Purpose**: Store prompts and embeddings in PostgreSQL database
 
 **Components**:
-- **Prepare for Database**: Sets parent_id and metadata
-- **Assert id**: Checks if input has UUID, generates if missing
-- **Code in Python**: Generates new UUID when needed
-- **Merge**: Combines generated UUID with input data
+- **Prepare for Database**: Sets metadata
+- **Assert parent_id**: Checks if input has parent_id, generates genesis UUID if missing
+- **Assert id**: Checks if input has UUID, generates from parent_id + prompt_text if missing
+- **Code in Python**: Generates UUIDs using uuid5
+- **Merge**: Combines generated UUIDs with input data
 - **Insert or Update Prompts**: PostgreSQL upsert operation
 
 **Process**:
-1. Receives data from embedding_step_v2
-2. Sets `parent_id` to genesis UUID (5af4727c-0283-580d-a2e5-c78f0fcea5ce)
-3. Creates `metadata` object with sessionId and embeddingModel
-4. Checks if `id` field exists
-5. If no `id`, generates new UUID and merges with data
-6. Upserts record to `prompts` table
+1. Receives data from embedding_step_v3
+2. Creates `metadata` object with sessionId and model_embedding
+3. Checks if `parent_id` field exists, generates genesis UUID if missing
+4. Checks if `id` field exists, generates new UUID from parent_id + prompt_text if missing
+5. Upserts record to `prompts` table
 
 **Database Fields**:
 - `id`: UUID (auto-generated if not provided)
@@ -248,7 +280,7 @@ This ensures all downstream workflows receive valid, normalized data.
 {
   "prompt_text": "string",
   "embedding": "[0.1,0.2,...]",
-  "embeddingModel": "embeddinggemma:300m",
+  "model_embedding": "embeddinggemma:latest",
   "sessionId": "string"
 }
 ```
@@ -257,10 +289,10 @@ This ensures all downstream workflows receive valid, normalized data.
 ```json
 {
   "id": "uuid",
-  "parent_id": "5af4727c-0283-580d-a2e5-c78f0fcea5ce",
+  "parent_id": "<genesis-uuid>",
   "prompt_text": "string",
   "embedding": "[0.1,0.2,...]",
-  "metadata": {"sessionId": "...", "embeddingModel": "..."},
+  "metadata": {"sessionId": "...", "model_embedding": "..."},
   "success": true
 }
 ```
@@ -287,27 +319,32 @@ To test:
 
 ### Field Mapping
 
-**Orchestrator → Asserting Step**:
-- `model`, `systemPrompt`, `prompt`, `context`, `sessionId`
+**Orchestrator → Fetch Data**:
+- (no input required, reads from files)
+
+**Fetch Data → Asserting Step**:
+- `model_first`, `model_second`, `model_embedding`, `system_prompt_first`
 
 **Asserting Step → First Prompt Generator**:
 - All validated fields pass through
 
 **First Prompt Generator → Second Prompt Generator**:
-- `model` - LLM model name (passed through)
-- `userPrompt` - User's original task (extracted from `$json.userPrompt`)
+- `model_second` - LLM model name (passed through)
+- `user_intent` - User's original task (extracted from `$json.user_intent`)
+- `key_requirements` - Task requirements (extracted from `$json.key_requirements`)
+- `optimization_notes` - Optimization notes (extracted from `$json.optimization_notes`)
 - `sessionId` - Session tracking (passed through)
-- `systemPrompt` - Generated prompt (extracted from `$json.output.systemPrompt`)
+- `system_prompt_second` - Generated prompt (extracted from `$json.output.system_prompt_second`)
 
 ### Structured Output Parser
 
 First prompt generator uses manual JSON schema:
 ```json
 {
-  "systemPrompt": { "type": "string" },
-  "userIntent": { "type": "string" },
-  "keyRequirements": { "type": "array", "items": { "type": "string" } },
-  "optimizationNotes": { "type": "string" }
+  "system_prompt_second": { "type": "string" },
+  "user_intent": { "type": "string" },
+  "key_requirements": { "type": "array", "items": { "type": "string" } },
+  "optimization_notes": { "type": "string" }
 }
 ```
 
@@ -337,23 +374,23 @@ The database supports evolutionary prompt tracking:
 ### PostgreSQL Databases
 
 1. **Main Database** (port 5433)
-   - Image: `pgvector/pgvector:pg16`
+   - Image: `postgres:18-alpine`
    - Purpose: Prompt storage with vector embeddings
    - Extensions: pgvector
    - Volume: `./instance/postgres_data`
 
 2. **n8n Database** (port 5432)
-   - Image: `postgres:15-alpine`
+   - Image: `postgres:18-alpine`
    - Purpose: n8n workflow and execution storage
    - Volume: `./instance/n8n_postgres_data`
 
 ### n8n Server
 
-- Image: `n8nio/n8n:1.120.2`
+- Image: `n8nio/n8n:1.122.5`
 - Port: 5678
 - Volumes:
   - configs: `./instance/n8n_data`
-  - workflows: `./include/workflows`
+  - workflows: `./include/uploads/workflows`
   - custom nodes: `./include/custom/dist`
   - uploads: `./include/uploads`
 
@@ -373,20 +410,23 @@ Both require NVIDIA GPU with CUDA support.
 
 ### Chat Models
 
-Current: **qwen2.5:3b** (via Ollama)
+Current: **qwen2.5:latest** (via Ollama)
 - Good structured output support
 - Sufficient for meta-prompting tasks
 - Balance of speed and capability
 
-Note: `llama3.2:1b` is too small - causes empty output errors.
+Fallback: **llama3.2:latest**
+- Lighter model for simpler tasks
+- Faster inference
+
+Note: Smaller models (<3B) can cause empty output errors in structured parsing.
 
 ### Embedding Model
 
-Current: **embeddinggemma** (via Ollama)
+Current: **embeddinggemma:latest** (via Ollama)
 - Produces 768-dimensional vectors
 - Good semantic similarity quality
 - Database configured for vector(768)
-- Note: Model name may show as "embeddinggemma:300m" but outputs 768 dimensions
 
 ## Common Issues
 
