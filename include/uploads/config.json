@@ -1,0 +1,5 @@
+{
+    "model_first": "qwen2.5:3b",
+    "model_second": "qwen2.5:3b",
+    "model_embedding": "embeddinggemma:300m"
+}

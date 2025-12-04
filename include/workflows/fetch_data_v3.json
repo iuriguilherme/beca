@@ -1,0 +1,311 @@
+{
+  "name": "fetch_data_v3",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "457e821e-dd10-4c63-9848-c317f75506a8",
+              "name": "model_first",
+              "value": "={{ $json.data.model_first }}",
+              "type": "string"
+            },
+            {
+              "id": "6323f3aa-fbe0-45d6-a9f0-30416a7cdbc6",
+              "name": "model_second",
+              "value": "={{ $json.data.model_second }}",
+              "type": "string"
+            },
+            {
+              "id": "12afc1b6-cfab-4d4e-a8db-f0ae7846d7d0",
+              "name": "model_embedding",
+              "value": "={{ $json.data.model_embedding }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        944,
+        272
+      ],
+      "id": "8057ac8f-d1d5-48c0-a76d-ddde996eac6e",
+      "name": "Define Model"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "891065ab-55c6-4209-9bd4-9cb25cebd35a",
+              "name": "system_prompt_first",
+              "value": "={{ $json.data }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        944,
+        464
+      ],
+      "id": "89e02f4d-d587-4b38-bd8d-8aa065dabc8c",
+      "name": "Define first system prompt"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        48,
+        272
+      ],
+      "id": "f013c1e9-af84-4930-b4c2-b07a01a2d2a7",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        48,
+        464
+      ],
+      "id": "84fdb05a-15d2-48f2-90ce-bf99390eb9d5",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        272,
+        368
+      ],
+      "id": "d8db4d52-c65f-40ad-bfa3-9a0097e814d6",
+      "name": "Start"
+    },
+    {
+      "parameters": {
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1392,
+        368
+      ],
+      "id": "9a939529-d3d6-4193-99e6-d70ee9a2346b",
+      "name": "Return"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1168,
+        368
+      ],
+      "id": "8f40bdea-30f3-41c2-855a-985bd86db037",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "fileSelector": "../uploads/config.json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        496,
+        272
+      ],
+      "id": "51b73eca-c1db-490f-ac75-96c6a261cd20",
+      "name": "Read config file"
+    },
+    {
+      "parameters": {
+        "fileSelector": "../uploads/meta_prompt.md",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        496,
+        464
+      ],
+      "id": "9ef6c256-3564-4592-acd0-03e023263ac1",
+      "name": "Read markdown file"
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        720,
+        464
+      ],
+      "id": "0e5398cb-224b-417b-bca2-989e2d05e9fb",
+      "name": "Extract meta prompt"
+    },
+    {
+      "parameters": {
+        "operation": "fromJson",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        720,
+        272
+      ],
+      "id": "a0568324-ed94-41ec-b27d-32a6330f31b9",
+      "name": "Extract from config file"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Define Model": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Start",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Start",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Read config file",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Read markdown file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Define first system prompt": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Return",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read config file": {
+      "main": [
+        [
+          {
+            "node": "Extract from config file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read markdown file": {
+      "main": [
+        [
+          {
+            "node": "Extract meta prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from config file": {
+      "main": [
+        [
+          {
+            "node": "Define Model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract meta prompt": {
+      "main": [
+        [
+          {
+            "node": "Define first system prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "fc70050f-fa44-41df-8c8e-5ecf65699a02",
+  "meta": {
+    "instanceId": "5477294f5d3a06ea145a32cfe84f2a422eac233f472a30914283db00ed658afe"
+  },
+  "id": "qW4Fu0umS0SOwyvO",
+  "tags": []
+}

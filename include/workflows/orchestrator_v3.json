@@ -1,0 +1,952 @@
+{
+  "name": "orchestrator_v3",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        -64
+      ],
+      "id": "bbb434a5-5eb5-41f6-a5d4-f67a566f1392",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        16,
+        224
+      ],
+      "id": "b9a6bf5a-80c0-4ea1-ad00-ce4d7fc4cef5",
+      "name": "When chat message received",
+      "webhookId": "1cefc77a-e019-4c86-9783-88089b29bb9f"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -208,
+        128
+      ],
+      "id": "2201fd35-81ff-4dc2-a9c3-b6bc04076ee3",
+      "name": "Schedule Trigger",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        16,
+        416
+      ],
+      "id": "a4901b06-34e8-4023-b3ad-0fd56ce60f5f",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4048,
+        224
+      ],
+      "id": "80057ac6-daf3-4e30-a60c-cca10f8060b8",
+      "name": "Return"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        240,
+        224
+      ],
+      "id": "a881bdd3-d736-4fa8-8e61-c07a4cfa9208",
+      "name": "Start"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3824,
+        224
+      ],
+      "id": "d0886845-1ac2-40ea-90de-0d7789dd415e",
+      "name": "End"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "xn9V9henO2ZXcvom",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/xn9V9henO2ZXcvom",
+          "cachedResultName": "asserting_step_v3"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        912,
+        224
+      ],
+      "id": "e79947cf-48d8-4fb3-a67c-794b1cd0eee9",
+      "name": "Asserting Step"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "rpZrwxFvLpUiCjfF",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/rpZrwxFvLpUiCjfF",
+          "cachedResultName": "first_prompt_generator_v3"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "sessionId",
+              "displayName": "sessionId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "model_first",
+              "displayName": "model_first",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "model_second",
+              "displayName": "model_second",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "system_prompt_first",
+              "displayName": "system_prompt_first",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "user_prompt",
+              "displayName": "user_prompt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "context",
+              "displayName": "context",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1360,
+        512
+      ],
+      "id": "8ce5d36e-e7db-46ec-b458-a01c89f5420d",
+      "name": "First Prompt Generator"
+    },
+    {
+      "parameters": {
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1584,
+        512
+      ],
+      "id": "432167ca-8f90-4756-8095-9444766710ba",
+      "name": "Parse first output"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "2upP7YeQ0P1Yv93h",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/2upP7YeQ0P1Yv93h",
+          "cachedResultName": "second_prompt_generator_v1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        2032,
+        416
+      ],
+      "id": "30c312bf-e47d-41f7-951a-54e94b1a0e17",
+      "name": "Second Prompt Generator"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e63f9e41-5f76-437b-99ad-c59a8cc7e82a",
+              "name": "generated_prompt",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2256,
+        416
+      ],
+      "id": "a1a74107-5f25-4ae2-bb40-3dec2da76ccb",
+      "name": "Parse second output"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "pyOCF7tB6IIfAP6u",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/pyOCF7tB6IIfAP6u",
+          "cachedResultName": "embedding_step_v3"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "sessionId",
+              "displayName": "sessionId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "model_embedding",
+              "displayName": "model_embedding",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "generated_prompt",
+              "displayName": "generated_prompt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        2704,
+        320
+      ],
+      "id": "cda2f3fd-caec-4e4f-98ca-f7a0d6f23fc4",
+      "name": "Embedding Generator"
+    },
+    {
+      "parameters": {
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2928,
+        320
+      ],
+      "id": "4a63c21a-8fe9-4db9-aeee-a6427797d4a3",
+      "name": "Parse embeddings"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "gLckoq7auSgdtOMk",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/gLckoq7auSgdtOMk",
+          "cachedResultName": "persistence_step_v3"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        3376,
+        224
+      ],
+      "id": "e93c0806-0926-4c70-a93a-c8d668959fbd",
+      "name": "Persistence Step"
+    },
+    {
+      "parameters": {
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3600,
+        224
+      ],
+      "id": "acf77270-c60e-438c-b8b9-2afb92b99b8c",
+      "name": "Parse result"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2480,
+        320
+      ],
+      "id": "1d7b8cc4-c248-4a8f-9390-b26c1cb01fb0",
+      "name": "Merge original data with prompt"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "95544656-867d-4dbc-9db1-3f87a62e3774",
+              "name": "sessionId",
+              "value": "={{ $json.sessionId }}",
+              "type": "string"
+            },
+            {
+              "id": "fcb0d3cf-6bd5-42ae-9b06-31e8fdfec0fd",
+              "name": "model_first",
+              "value": "={{ $json.model_first }}",
+              "type": "string"
+            },
+            {
+              "id": "bbbeb24d-45e9-43fc-a692-b5326c07d7e9",
+              "name": "system_prompt_first",
+              "value": "={{ $json.system_prompt_first }}",
+              "type": "string"
+            },
+            {
+              "id": "0e9e23ba-b4db-4066-85a7-1e51dd4b05d9",
+              "name": "user_prompt",
+              "value": "={{ $json.user_prompt }}",
+              "type": "string"
+            },
+            {
+              "id": "ea65eb05-4d2d-4a79-8ae4-74eeae6f88af",
+              "name": "context",
+              "value": "={{ $json.context }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1136,
+        512
+      ],
+      "id": "dfd41886-8e5c-4dda-9fc2-2727dafbcfe0",
+      "name": "Parse first input"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "13a42353-738a-41ee-8c32-6d96d6196eb9",
+              "name": "sessionId",
+              "value": "={{ $json.sessionId }}",
+              "type": "string"
+            },
+            {
+              "id": "e9b1d93e-acb0-48e0-80e4-034b5e63ae04",
+              "name": "model_second",
+              "value": "={{ $json.model_second }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1584,
+        320
+      ],
+      "id": "1767e1cf-d246-4209-8b37-a406a2a23102",
+      "name": "Parse second input"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1808,
+        416
+      ],
+      "id": "b23e4459-d46e-4ae5-afad-02cc762cd4c7",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4ae0d7f8-ed94-49e7-94a9-bb91caf32937",
+              "name": "user_prompt",
+              "value": "How to use n8n to make an agent improve it's own system prompt",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        16,
+        32
+      ],
+      "id": "4645f610-ee1b-4db2-9b01-b7249c945e6a",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "qW4Fu0umS0SOwyvO",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/qW4Fu0umS0SOwyvO",
+          "cachedResultName": "fetch_data_v3"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        464,
+        296
+      ],
+      "name": "Fetch config data",
+      "id": "575d6fea-b156-4fd4-8e4d-c44ef8557163"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6787e39b-eede-426b-a11c-90f739a2fc0e",
+              "name": "sessionId",
+              "value": "={{ $json.sessionId }}",
+              "type": "string"
+            },
+            {
+              "id": "212e99f0-75db-4b48-9f84-52ca7cef9c2b",
+              "name": "model_embedding",
+              "value": "={{ $json.model_embedding }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2256,
+        152
+      ],
+      "id": "66b70485-1ea7-4d6b-a9ce-e939cde2327d",
+      "name": "Parse embedding input"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        688,
+        224
+      ],
+      "id": "db9eb14d-4785-4436-8e12-8717c472d350",
+      "name": "Merge user prompt with config"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        3152,
+        224
+      ],
+      "id": "8b8556d4-87fc-487e-a8e1-f2e460d7c2bc",
+      "name": "Merge final data"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c710eb7a-d029-4258-b34d-f2382cc4f374",
+              "name": "sessionId",
+              "value": "={{ $json.sessionId }}",
+              "type": "string"
+            },
+            {
+              "id": "c2d1bb00-a7b7-4e08-9022-44e334fee1c6",
+              "name": "user_prompt",
+              "value": "={{ $json.user_prompt }}",
+              "type": "string"
+            },
+            {
+              "id": "8762ada5-ad3d-46a3-a397-5feafd23ead2",
+              "name": "model_embedding",
+              "value": "={{ $json.model_embedding }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2928,
+        -16
+      ],
+      "id": "c0551c11-7097-4d0a-b18e-c783888f46f0",
+      "name": "Parse final input"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Start",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Start",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Merge user prompt with config",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch config data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "End": {
+      "main": [
+        [
+          {
+            "node": "Return",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Asserting Step": {
+      "main": [
+        [
+          {
+            "node": "Parse second input",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Parse first input",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Parse embedding input",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Parse final input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "First Prompt Generator": {
+      "main": [
+        [
+          {
+            "node": "Parse first output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse first output": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Second Prompt Generator": {
+      "main": [
+        [
+          {
+            "node": "Parse second output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse second output": {
+      "main": [
+        [
+          {
+            "node": "Merge original data with prompt",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Embedding Generator": {
+      "main": [
+        [
+          {
+            "node": "Parse embeddings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse embeddings": {
+      "main": [
+        [
+          {
+            "node": "Merge final data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Persistence Step": {
+      "main": [
+        [
+          {
+            "node": "Parse result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse result": {
+      "main": [
+        [
+          {
+            "node": "End",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge original data with prompt": {
+      "main": [
+        [
+          {
+            "node": "Embedding Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse first input": {
+      "main": [
+        [
+          {
+            "node": "First Prompt Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse second input": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Second Prompt Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Start",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch config data": {
+      "main": [
+        [
+          {
+            "node": "Merge user prompt with config",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Parse embedding input": {
+      "main": [
+        [
+          {
+            "node": "Merge original data with prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge user prompt with config": {
+      "main": [
+        [
+          {
+            "node": "Asserting Step",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge final data": {
+      "main": [
+        [
+          {
+            "node": "Persistence Step",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse final input": {
+      "main": [
+        [
+          {
+            "node": "Merge final data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cd13f2cf-ad7f-4965-8d9f-c4d16a43aae7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5477294f5d3a06ea145a32cfe84f2a422eac233f472a30914283db00ed658afe"
+  },
+  "id": "8f8PQgPy6rDWvpGM",
+  "tags": [
+    {
+      "updatedAt": "2025-11-30T20:56:33.087Z",
+      "createdAt": "2025-11-30T20:56:33.087Z",
+      "id": "yvZJPTtKvYrUjXfA",
+      "name": "level1"
+    }
+  ]
+}

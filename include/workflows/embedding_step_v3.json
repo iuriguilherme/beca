@@ -1,9 +1,21 @@
 {
-  "name": "embedding_step_v2",
+  "name": "embedding_step_v3",
   "nodes": [
     {
       "parameters": {
-        "inputSource": "passthrough"
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "sessionId"
+            },
+            {
+              "name": "model_embedding"
+            },
+            {
+              "name": "generated_prompt"
+            }
+          ]
+        }
       },
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1.1,
@@ -30,21 +42,21 @@
         "assignments": {
           "assignments": [
             {
-              "id": "8ce154ab-4401-4f53-a653-c96f5d5b039c",
-              "name": "prompt",
-              "value": "Packaging a Python module involves several steps to make your code ready for distribution on platforms like PyPI (Python Package Index). Below is a step-by-step guide using `setuptools` as the primary tool for packaging. This process includes creating a setup script, building and installing your package.  ### Step 1: Create a `setup.py` file The `setup.py` file is where you declare various attributes about your Python project. The following example assumes that your module will be installed using pip.  ```python from setuptools import setup, find_packages  # Metadata setup(     name='your_package_name',     version='0.1',     author='Your Name',     description='A brief description of the package',     packages=find_packages(),  # Automatically finds all packages in your project     install_requires=[],       # Packages required by your module (if any)     python_requires='>=3.6',   # Python version requirement ) ```  ### Step 2: Install `setuptools` and `wheel` Ensure you have the necessary tools installed to create a distribution package of your application.  ```bash pip install setuptools wheel ```  ### Step 3: Build your project for distribution You can build your package into an Sdist (source tarball) using:  ```bash python setup.py sdist --formats gztar ```  This command will generate an archive file (e.g., `your_package_name-0.1.tar.gz`) in the directory where you run this command.  ### Step 4: Create a wheel distribution A wheel is a binary distribution package format, which can be installed directly using pip without needing to compile source code.  ```bash python setup.py bdist_wheel --universal ```  This will generate `your_package_name-0.1-py3-none-any.whl` and additional files in the build directory.  ### Step 5: Distribute your package Your wheel file can now be uploaded to PyPI or shared with others via Git repositories, etc.  For uploading to PyPI:  ```bash python -m twine upload dist/* ```  You will need a PyPI account and follow the instructions provided by `twine` for authentication. After completing this step, your package will be available on PyPI for installation using pip.  ### Additional Considerations  - **Dependencies**: If your project relies on other libraries (e.g., requests, pandas), include their names in `install_requires`.    - **Tests**: Consider writing tests with tools like `pytest` to ensure that your code works correctly. You might want to run these during the installation process.  ```python # Adding test dependencies for pip install. setup(     ...     tests_require=['pytest'], ) ```  - **Documentation**: Use Sphinx or other documentation generators to create a README.md and install instructions, which can be very helpful for others who use your package. You can build these using:  ```bash pip install sphinx cd docs make html  # Assuming you have a `conf.py` file in the root of your project ```  This will generate HTML documentation files that can be served online.  By following these steps, you'll be able to create a well-structured and ready-to-distribute Python package.",
+              "id": "07e9b485-c31e-4ee1-943c-46555891f0d0",
+              "name": "sessionId",
+              "value": "={{ Math.floor(Math.random() * 1e15) }}",
               "type": "string"
             },
             {
               "id": "a246e9fa-e01e-49c8-9e34-1ce6653f6a28",
-              "name": "embeddingModel",
+              "name": "model_embedding",
               "value": "embeddinggemma:300m",
               "type": "string"
             },
             {
-              "id": "07e9b485-c31e-4ee1-943c-46555891f0d0",
-              "name": "sessionId",
-              "value": "={{ Math.floor(Math.random() * 1e15) }}",
+              "id": "8ce154ab-4401-4f53-a653-c96f5d5b039c",
+              "name": "generated_prompt",
+              "value": "Packaging a Python module involves several steps to make your code ready for distribution on platforms like PyPI (Python Package Index). Below is a step-by-step guide using `setuptools` as the primary tool for packaging. This process includes creating a setup script, building and installing your package.  ### Step 1: Create a `setup.py` file The `setup.py` file is where you declare various attributes about your Python project. The following example assumes that your module will be installed using pip.  ```python from setuptools import setup, find_packages  # Metadata setup(     name='your_package_name',     version='0.1',     author='Your Name',     description='A brief description of the package',     packages=find_packages(),  # Automatically finds all packages in your project     install_requires=[],       # Packages required by your module (if any)     python_requires='>=3.6',   # Python version requirement ) ```  ### Step 2: Install `setuptools` and `wheel` Ensure you have the necessary tools installed to create a distribution package of your application.  ```bash pip install setuptools wheel ```  ### Step 3: Build your project for distribution You can build your package into an Sdist (source tarball) using:  ```bash python setup.py sdist --formats gztar ```  This command will generate an archive file (e.g., `your_package_name-0.1.tar.gz`) in the directory where you run this command.  ### Step 4: Create a wheel distribution A wheel is a binary distribution package format, which can be installed directly using pip without needing to compile source code.  ```bash python setup.py bdist_wheel --universal ```  This will generate `your_package_name-0.1-py3-none-any.whl` and additional files in the build directory.  ### Step 5: Distribute your package Your wheel file can now be uploaded to PyPI or shared with others via Git repositories, etc.  For uploading to PyPI:  ```bash python -m twine upload dist/* ```  You will need a PyPI account and follow the instructions provided by `twine` for authentication. After completing this step, your package will be available on PyPI for installation using pip.  ### Additional Considerations  - **Dependencies**: If your project relies on other libraries (e.g., requests, pandas), include their names in `install_requires`.    - **Tests**: Consider writing tests with tools like `pytest` to ensure that your code works correctly. You might want to run these during the installation process.  ```python # Adding test dependencies for pip install. setup(     ...     tests_require=['pytest'], ) ```  - **Documentation**: Use Sphinx or other documentation generators to create a README.md and install instructions, which can be very helpful for others who use your package. You can build these using:  ```bash pip install sphinx cd docs make html  # Assuming you have a `conf.py` file in the root of your project ```  This will generate HTML documentation files that can be served online.  By following these steps, you'll be able to create a well-structured and ready-to-distribute Python package.",
               "type": "string"
             }
           ]
@@ -133,6 +145,34 @@
     },
     {
       "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0b0845c5-9c92-4354-93fe-ae83065b194e",
+              "name": "embedding",
+              "value": "={{ $json.embedding }}",
+              "type": "string"
+            },
+            {
+              "id": "6c94e8d7-219b-4750-91ed-d1c5a016646d",
+              "name": "prompt_text",
+              "value": "={{ $json.prompt_text }}",
+              "type": "string"
+            },
+            {
+              "id": "fe94c62c-80e6-4df0-93f2-53e7725a4331",
+              "name": "model_embedding",
+              "value": "={{ $json.model_embedding }}",
+              "type": "string"
+            },
+            {
+              "id": "a48be355-8828-48c4-8199-22adba9eb16d",
+              "name": "sessionId",
+              "value": "={{ $json.sessionId }}",
+              "type": "string"
+            }
+          ]
+        },
         "includeOtherFields": true,
         "options": {}
       },
@@ -164,7 +204,7 @@
         "url": "http://ollama:11434/api/embeddings",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"model\": \"{{ $json.embeddingModel }}\",\n  \"prompt\": \"{{ $json.prompt }}\"\n}",
+        "jsonBody": "={\n  \"model\": \"{{ $json.model_embedding }}\",\n  \"prompt\": \"{{ $json.generated_prompt }}\"\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -190,13 +230,13 @@
             {
               "id": "embedding-format-2",
               "name": "prompt_text",
-              "value": "={{ $json.prompt }}",
+              "value": "={{ $json.generated_prompt }}",
               "type": "string"
             },
             {
               "id": "3b644acf-d953-4d8c-8690-e086108efdb4",
-              "name": "embeddingModel",
-              "value": "={{ $json.embeddingModel }}",
+              "name": "model_embedding",
+              "value": "={{ $json.model_embedding }}",
               "type": "string"
             },
             {
@@ -363,7 +403,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "44514091-62ea-49e0-b2d2-f1eaa4cfe672",
+  "versionId": "b90afd7a-7bf4-4029-be48-fb55905e4e86",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "5477294f5d3a06ea145a32cfe84f2a422eac233f472a30914283db00ed658afe"
