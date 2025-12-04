@@ -808,6 +808,7 @@
   },
   "pinData": {},
   "versionId": "d2d75611-33f4-4b70-9093-b59abc605c69",
+  "activeVersionId": null,
   "versionCounter": 41,
   "triggerCount": 0,
   "tags": [
@@ -820,16 +821,16 @@
   ],
   "shared": [
     {
-      "updatedAt": "2025-11-30T21:34:54.701Z",
-      "createdAt": "2025-11-30T21:34:54.701Z",
+      "updatedAt": "2025-12-04T17:52:54.896Z",
+      "createdAt": "2025-12-04T17:52:54.896Z",
       "role": "workflow:owner",
       "workflowId": "xn9V9henO2ZXcvom",
-      "projectId": "YTOrz7CHLJRvD6yM",
+      "projectId": "G7MwyqNqY0Rnoh0q",
       "project": {
-        "updatedAt": "2025-11-30T20:40:47.978Z",
-        "createdAt": "2025-11-30T20:39:31.365Z",
-        "id": "YTOrz7CHLJRvD6yM",
-        "name": "Iuri Guilherme <aindatenhoconta@gmail.com>",
+        "updatedAt": "2025-12-04T17:52:47.599Z",
+        "createdAt": "2025-12-04T17:52:47.599Z",
+        "id": "G7MwyqNqY0Rnoh0q",
+        "name": "Unnamed Project",
         "type": "personal",
         "icon": null,
         "description": null

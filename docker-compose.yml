@@ -11,7 +11,7 @@ networks:
 
 
 x-n8n: &service-n8n
-  image: n8nio/n8n:1.120.2
+  image: n8nio/n8n:1.122.5
   networks: [ 'beca_network' ]
   environment:
     - DB_TYPE=postgresdb
@@ -27,9 +27,10 @@ x-n8n: &service-n8n
     - path: .env
       required: true
   user: "node"
+  working_dir: /home/node/.n8n
 
 x-ollama: &service-ollama
-  image: ollama/ollama:0.12.11
+  image: ollama/ollama:0.13.1
   container_name: beca_ollama
   networks: [ 'beca_network' ]
   restart: unless-stopped
@@ -40,7 +41,7 @@ x-ollama: &service-ollama
     - ./instance/ollama_data/models:/root/.ollama/models
 
 x-init-ollama: &init-ollama
-  image: ollama/ollama:0.12.11
+  image: ollama/ollama:0.13.1
   networks: [ 'beca_network' ]
   container_name: beca_ollama_pull
   volumes:
@@ -56,52 +57,94 @@ x-init-ollama: &init-ollama
     - path: .env
       required: true
 
+x-postgres: &service-postgres
+  image: postgres:18-alpine
+  networks: [ 'beca_network' ]
+  restart: unless-stopped
+  environment:
+    - POSTGRES_USER
+    - POSTGRES_PASSWORD
+    - POSTGRES_DB
+    - PGPASSWORD=${POSTGRES_PASSWORD}
+  healthcheck:
+    test: [ 'CMD-SHELL', 'pg_isready -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB}' ]
+    interval: 5s
+    timeout: 5s
+    retries: 10
+
+x-postgres-import: &service-postgres-import
+  <<: *service-postgres
+  entrypoint: /bin/sh
+  restart: no
+
+x-postgres-upgrade: &service-postgres-upgrade
+  image: pgautoupgrade/pgautoupgrade
+  restart: no
+  environment:
+    - POSTGRES_USER
+    - POSTGRES_PASSWORD
+    - POSTGRES_DB
+
 services:
 
-  postgres:
-    image: postgres:16-alpine
-    hostname: postgres
-    container_name: beca_postgres
+  n8n_server:
+    <<: *service-n8n
+    profiles: [ "cpu", "gpu-nvidia", "gpu-amd" ]
+    hostname: n8n
+    container_name: beca_n8n_server
+    restart: unless-stopped
+    ports:
+      - 5678:5678
+    volumes:
+      - ./instance/n8n_data:/home/node/.n8n
+      - ./include/custom/dist:/home/node/.n8n/custom
+      - ./include/uploads:/home/node/uploads
+    depends_on:
+      n8n_db:
+        condition: service_healthy
+    healthcheck:
+      test: [ 'CMD', 'curl', '-f', 'http://localhost:5678/rest/healthz' ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    # extra_hosts:
+    #   - "host.docker.internal:host-gateway"
+
+  qdrant:
+    image: qdrant/qdrant
+    profiles: [ "cpu", "gpu-nvidia", "gpu-amd" ]
+    hostname: qdrant
     networks: [ 'beca_network' ]
     restart: unless-stopped
-    environment:
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_DB
+    ports:
+      - 6333:6333
+    volumes:
+      - ./instance/qdrant_data:/qdrant/storage
+
+  postgres:
+    <<: *service-postgres
+    profiles: [ "cpu", "gpu-nvidia", "gpu-amd", "export", "import" ]
+    hostname: postgres
+    volumes:
+      - ./instance/postgres_data:${POSTGRES_DATA_PATH:-/var/lib/postgresql}
+      - ./include/init.sql:/docker-entrypoint-initdb.d/init.sql
     env_file:
       - path: .env.db
         required: true
-    volumes:
-      - ./instance/postgres_data:/var/lib/postgresql/data
-      - ./include/init.sql:/docker-entrypoint-initdb.d/init.sql
-    healthcheck:
-      test: [ 'CMD-SHELL', 'pg_isready -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB}' ]
-      interval: 5s
-      timeout: 5s
-      retries: 10
 
   n8n_db:
-    image: postgres:15-alpine
+    <<: *service-postgres
+    profiles: [ "cpu", "gpu-nvidia", "gpu-amd", "export", "import" ]
     hostname: db
-    container_name: beca_n8n_db
-    networks: [ 'beca_network' ]
-    restart: unless-stopped
-    environment:
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_DB
     volumes:
-      - ./instance/n8n_postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: [ 'CMD-SHELL', 'pg_isready -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB}' ]
-      interval: 5s
-      timeout: 5s
-      retries: 10
+      - ./instance/n8n_postgres_data:${POSTGRES_DATA_PATH:-/var/lib/postgresql}
+    env_file:
+      - path: .env
+        required: true
 
   n8n_import:
     <<: *service-n8n
-    hostname: n8n_import
-    container_name: beca_n8n_import
+    profiles: [ "import" ]
     entrypoint: /bin/sh
     command:
       - "-c"
@@ -115,9 +158,7 @@ services:
 
   n8n_export:
     <<: *service-n8n
-    profiles: [ "backup" ]
-    hostname: n8n_export
-    container_name: beca_n8n_export
+    profiles: [ "export" ]
     entrypoint: /bin/sh
     command:
       - "-c"
@@ -129,41 +170,85 @@ services:
       n8n_db:
         condition: service_healthy
 
-  n8n_server:
-    <<: *service-n8n
-    hostname: n8n
-    container_name: beca_n8n
-    restart: unless-stopped
-    working_dir: /home/node/.n8n
-    ports:
-      - 5678:5678
+  postgres_import:
+    <<: *service-postgres-import
+    profiles: [ "import" ]
+    command:
+      - "-c"
+      - "psql -h postgres -U ${POSTGRES_USER} -d ${POSTGRES_DB} < /backup/postgres.sql"
+    env_file:
+      - path: .env.db
+        required: true
     volumes:
-      - ./instance/n8n_data:/home/node/.n8n
-      - ./include/custom/dist:/home/node/.n8n/custom
-      - ./include/uploads:/home/node/uploads
+      - ./instance/database:/backup
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  n8n_postgres_import:
+    <<: *service-postgres-import
+    profiles: [ "import" ]
+    command:
+      - "-c"
+      - "psql -h db -U ${POSTGRES_USER} -d ${POSTGRES_DB} < /backup/n8n.sql"
+    env_file:
+      - path: .env
+        required: true
+    volumes:
+      - ./instance/database:/backup
     depends_on:
       n8n_db:
         condition: service_healthy
-      n8n_import:
-        condition: service_completed_successfully
-    healthcheck:
-      test: [ 'CMD', 'curl', '-f', 'http://localhost:5678/rest/healthz' ]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-    # extra_hosts:
-    #   - "host.docker.internal:host-gateway"
 
-  qdrant:
-    image: qdrant/qdrant
-    hostname: qdrant
-    container_name: beca_qdrant
-    networks: [ 'beca_network' ]
-    restart: unless-stopped
-    ports:
-      - 6333:6333
+  postgres_export:
+    <<: *service-postgres-import
+    profiles: [ "export" ]
+    command:
+      - "-c"
+      - "pg_dump -h postgres -U ${POSTGRES_USER} -d ${POSTGRES_DB} > /backup/postgres.$(date +%s).sql && pg_dump -h postgres -U ${POSTGRES_USER} -d ${POSTGRES_DB} > /backup/postgres.sql"
     volumes:
-      - ./instance/qdrant_data:/qdrant/storage
+      - ./instance/postgres_data:/var/lib/postgresql/18/docker
+      - ./instance/database:/backup
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - path: .env.db
+        required: true
+
+  n8n_postgres_export:
+    <<: *service-postgres-import
+    profiles: [ "export" ]
+    command:
+      - "-c"
+      - "pg_dump -h db -U ${POSTGRES_USER} -d ${POSTGRES_DB} > /backup/n8n.$(date +%s).sql && pg_dump -h db -U ${POSTGRES_USER} -d ${POSTGRES_DB} > /backup/n8n.sql"
+    volumes:
+      - ./instance/n8n_postgres_data:/var/lib/postgresql/18/docker
+      - ./instance/database:/backup
+    depends_on:
+      n8n_db:
+        condition: service_healthy
+    env_file:
+      - path: .env
+        required: true
+
+  postgres_upgrade:
+    <<: *service-postgres-upgrade
+    profiles: [ "migration" ]
+    volumes:
+      - ./instance/postgres_data:/var/lib/postgresql
+    env_file:
+      - path: .env.db
+        required: true
+
+  n8n_postgres_upgrade:
+    <<: *service-postgres-upgrade
+    profiles: [ "migration" ]
+    volumes:
+      - ./instance/n8n_postgres_data:/var/lib/postgresql
+    env_file:
+      - path: .env
+        required: true
 
   ollama-cpu:
     profiles: [ "cpu" ]
@@ -183,7 +268,7 @@ services:
   ollama-gpu-amd:
     profiles: [ "gpu-amd" ]
     <<: *service-ollama
-    image: ollama/ollama:rocm
+    image: ollama/ollama:0.13.1-rocm
     devices:
       - "/dev/kfd"
       - "/dev/dri"
@@ -201,7 +286,7 @@ services:
       - ollama-gpu
 
   ollama-pull-llama-gpu-amd:
-    profiles: [ gpu-amd ]
+    profiles: [ "gpu-amd" ]
     <<: *init-ollama
     image: ollama/ollama:rocm
     depends_on:

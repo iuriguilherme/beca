@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-12-04T15:10:42.248Z",
+  "updatedAt": "2025-12-04T18:14:59.194Z",
   "createdAt": "2025-11-30T23:39:50.932Z",
   "id": "2upP7YeQ0P1Yv93h",
   "name": "second_prompt_generator_v3",
@@ -477,7 +477,8 @@
   },
   "pinData": {},
   "versionId": "36cd973e-3772-46b9-b14a-8e9869f2dfd8",
-  "versionCounter": 15,
+  "activeVersionId": null,
+  "versionCounter": 21,
   "triggerCount": 0,
   "tags": [
     {
@@ -489,16 +490,16 @@
   ],
   "shared": [
     {
-      "updatedAt": "2025-11-30T23:39:50.932Z",
-      "createdAt": "2025-11-30T23:39:50.932Z",
+      "updatedAt": "2025-12-04T17:52:54.896Z",
+      "createdAt": "2025-12-04T17:52:54.896Z",
       "role": "workflow:owner",
       "workflowId": "2upP7YeQ0P1Yv93h",
-      "projectId": "YTOrz7CHLJRvD6yM",
+      "projectId": "G7MwyqNqY0Rnoh0q",
       "project": {
-        "updatedAt": "2025-11-30T20:40:47.978Z",
-        "createdAt": "2025-11-30T20:39:31.365Z",
-        "id": "YTOrz7CHLJRvD6yM",
-        "name": "Iuri Guilherme <aindatenhoconta@gmail.com>",
+        "updatedAt": "2025-12-04T17:52:47.599Z",
+        "createdAt": "2025-12-04T17:52:47.599Z",
+        "id": "G7MwyqNqY0Rnoh0q",
+        "name": "Unnamed Project",
         "type": "personal",
         "icon": null,
         "description": null

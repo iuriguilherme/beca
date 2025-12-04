@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-12-04T15:10:42.248Z",
+  "updatedAt": "2025-12-04T18:14:59.194Z",
   "createdAt": "2025-12-03T18:49:07.808Z",
   "id": "gLckoq7auSgdtOMk",
   "name": "persistence_step_v3",
@@ -680,7 +680,8 @@
   },
   "pinData": {},
   "versionId": "dcee783e-0373-45fd-ac32-cc94ddabd625",
-  "versionCounter": 21,
+  "activeVersionId": null,
+  "versionCounter": 27,
   "triggerCount": 0,
   "tags": [
     {
@@ -692,16 +693,16 @@
   ],
   "shared": [
     {
-      "updatedAt": "2025-12-03T18:49:07.808Z",
-      "createdAt": "2025-12-03T18:49:07.808Z",
+      "updatedAt": "2025-12-04T17:52:54.896Z",
+      "createdAt": "2025-12-04T17:52:54.896Z",
       "role": "workflow:owner",
       "workflowId": "gLckoq7auSgdtOMk",
-      "projectId": "YTOrz7CHLJRvD6yM",
+      "projectId": "G7MwyqNqY0Rnoh0q",
       "project": {
-        "updatedAt": "2025-11-30T20:40:47.978Z",
-        "createdAt": "2025-11-30T20:39:31.365Z",
-        "id": "YTOrz7CHLJRvD6yM",
-        "name": "Iuri Guilherme <aindatenhoconta@gmail.com>",
+        "updatedAt": "2025-12-04T17:52:47.599Z",
+        "createdAt": "2025-12-04T17:52:47.599Z",
+        "id": "G7MwyqNqY0Rnoh0q",
+        "name": "Unnamed Project",
         "type": "personal",
         "icon": null,
         "description": null
