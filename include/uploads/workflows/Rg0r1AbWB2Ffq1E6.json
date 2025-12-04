@@ -160,16 +160,16 @@
   "tags": [],
   "shared": [
     {
-      "updatedAt": "2025-12-04T17:52:54.896Z",
-      "createdAt": "2025-12-04T17:52:54.896Z",
+      "updatedAt": "2025-12-04T19:03:09.329Z",
+      "createdAt": "2025-12-04T19:03:09.329Z",
       "role": "workflow:owner",
       "workflowId": "Rg0r1AbWB2Ffq1E6",
-      "projectId": "G7MwyqNqY0Rnoh0q",
+      "projectId": "r5V1iX7YwEQ1HStn",
       "project": {
-        "updatedAt": "2025-12-04T17:52:47.599Z",
-        "createdAt": "2025-12-04T17:52:47.599Z",
-        "id": "G7MwyqNqY0Rnoh0q",
-        "name": "Unnamed Project",
+        "updatedAt": "2025-12-04T19:03:40.860Z",
+        "createdAt": "2025-12-04T19:02:58.191Z",
+        "id": "r5V1iX7YwEQ1HStn",
+        "name": "Iuri Guilherme <aindatenhoconta@gmail.com>",
         "type": "personal",
         "icon": null,
         "description": null

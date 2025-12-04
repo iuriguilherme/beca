@@ -28,11 +28,21 @@ x-n8n: &service-n8n
       required: true
   user: "node"
   working_dir: /home/node/.n8n
+  depends_on:
+    n8n_db:
+      condition: service_healthy
+  healthcheck:
+    test: [ 'CMD', 'curl', '-f', 'http://localhost:5678/rest/healthz' ]
+    interval: 30s
+    timeout: 5s
+    retries: 3
+  # extra_hosts:
+  #   - "host.docker.internal:host-gateway"
 
 x-ollama: &service-ollama
   image: ollama/ollama:0.13.1
-  container_name: beca_ollama
   networks: [ 'beca_network' ]
+  hostname: ollama
   restart: unless-stopped
   ports:
     - 11434:11434
@@ -41,49 +51,64 @@ x-ollama: &service-ollama
     - ./instance/ollama_data/models:/root/.ollama/models
 
 x-init-ollama: &init-ollama
-  image: ollama/ollama:0.13.1
-  networks: [ 'beca_network' ]
-  container_name: beca_ollama_pull
-  volumes:
-    - ./instance/ollama_data/ollama:/root/.ollama
+  <<: *service-ollama
   entrypoint: /bin/sh
   environment:
     - OLLAMA_HOST=${OLLAMA_HOST:-beca_ollama:11434}
     - OLLAMA_MODEL=${OLLAMA_MODEL:-llama3.2:latest}
   command:
     - "-c"
-    - "sleep 3; ollama pull ${OLLAMA_MODEL}"
+    - "sleep 3; ollama pull ${OLLAMA_MODEL:-llama3.2:latest}"
   env_file:
     - path: .env
       required: true
+  ports:
+    - 11435:11434
 
 x-postgres: &service-postgres
   image: postgres:18-alpine
   networks: [ 'beca_network' ]
   restart: unless-stopped
-  environment:
-    - POSTGRES_USER
-    - POSTGRES_PASSWORD
-    - POSTGRES_DB
-    - PGPASSWORD=${POSTGRES_PASSWORD}
   healthcheck:
     test: [ 'CMD-SHELL', 'pg_isready -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB}' ]
     interval: 5s
     timeout: 5s
     retries: 10
+  env_file:
+    - path: .env.db
+      required: true
+
+x-postgres-n8n: &service-postgres-n8n
+  <<: *service-postgres
+  env_file:
+    - path: .env
+      required: true
 
 x-postgres-import: &service-postgres-import
   <<: *service-postgres
   entrypoint: /bin/sh
   restart: no
+  volumes:
+    - ./instance/database:/backup
+  depends_on:
+    postgres:
+      condition: service_healthy
+
+x-postgres-import-n8n: &service-postgres-import-n8n
+  <<: *service-postgres-import
+  env_file:
+    - path: .env
+      required: true
+  depends_on:
+    n8n_db:
+      condition: service_healthy
 
 x-postgres-upgrade: &service-postgres-upgrade
   image: pgautoupgrade/pgautoupgrade
   restart: no
-  environment:
-    - POSTGRES_USER
-    - POSTGRES_PASSWORD
-    - POSTGRES_DB
+  env_file:
+    - path: .env.db
+      required: true
 
 services:
 
@@ -99,16 +124,6 @@ services:
       - ./instance/n8n_data:/home/node/.n8n
       - ./include/custom/dist:/home/node/.n8n/custom
       - ./include/uploads:/home/node/uploads
-    depends_on:
-      n8n_db:
-        condition: service_healthy
-    healthcheck:
-      test: [ 'CMD', 'curl', '-f', 'http://localhost:5678/rest/healthz' ]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-    # extra_hosts:
-    #   - "host.docker.internal:host-gateway"
 
   qdrant:
     image: qdrant/qdrant
@@ -128,19 +143,13 @@ services:
     volumes:
       - ./instance/postgres_data:${POSTGRES_DATA_PATH:-/var/lib/postgresql}
       - ./include/init.sql:/docker-entrypoint-initdb.d/init.sql
-    env_file:
-      - path: .env.db
-        required: true
 
   n8n_db:
-    <<: *service-postgres
+    <<: *service-postgres-n8n
     profiles: [ "cpu", "gpu-nvidia", "gpu-amd", "export", "import" ]
     hostname: db
     volumes:
       - ./instance/n8n_postgres_data:${POSTGRES_DATA_PATH:-/var/lib/postgresql}
-    env_file:
-      - path: .env
-        required: true
 
   n8n_import:
     <<: *service-n8n
@@ -152,9 +161,6 @@ services:
     volumes:
       - ./include/uploads:/home/node/uploads
       - ./instance/credentials:/home/node/uploads/credentials
-    depends_on:
-      n8n_db:
-        condition: service_healthy
 
   n8n_export:
     <<: *service-n8n
@@ -166,9 +172,6 @@ services:
     volumes:
       - ./include/uploads:/home/node/uploads
       - ./instance/credentials:/home/node/uploads/credentials
-    depends_on:
-      n8n_db:
-        condition: service_healthy
 
   postgres_import:
     <<: *service-postgres-import
@@ -176,29 +179,13 @@ services:
     command:
       - "-c"
       - "psql -h postgres -U ${POSTGRES_USER} -d ${POSTGRES_DB} < /backup/postgres.sql"
-    env_file:
-      - path: .env.db
-        required: true
-    volumes:
-      - ./instance/database:/backup
-    depends_on:
-      postgres:
-        condition: service_healthy
 
   n8n_postgres_import:
-    <<: *service-postgres-import
+    <<: *service-postgres-import-n8n
     profiles: [ "import" ]
     command:
       - "-c"
       - "psql -h db -U ${POSTGRES_USER} -d ${POSTGRES_DB} < /backup/n8n.sql"
-    env_file:
-      - path: .env
-        required: true
-    volumes:
-      - ./instance/database:/backup
-    depends_on:
-      n8n_db:
-        condition: service_healthy
 
   postgres_export:
     <<: *service-postgres-import
@@ -206,40 +193,19 @@ services:
     command:
       - "-c"
       - "pg_dump -h postgres -U ${POSTGRES_USER} -d ${POSTGRES_DB} > /backup/postgres.$(date +%s).sql && pg_dump -h postgres -U ${POSTGRES_USER} -d ${POSTGRES_DB} > /backup/postgres.sql"
-    volumes:
-      - ./instance/postgres_data:/var/lib/postgresql/18/docker
-      - ./instance/database:/backup
-    depends_on:
-      postgres:
-        condition: service_healthy
-    env_file:
-      - path: .env.db
-        required: true
 
   n8n_postgres_export:
-    <<: *service-postgres-import
+    <<: *service-postgres-import-n8n
     profiles: [ "export" ]
     command:
       - "-c"
       - "pg_dump -h db -U ${POSTGRES_USER} -d ${POSTGRES_DB} > /backup/n8n.$(date +%s).sql && pg_dump -h db -U ${POSTGRES_USER} -d ${POSTGRES_DB} > /backup/n8n.sql"
-    volumes:
-      - ./instance/n8n_postgres_data:/var/lib/postgresql/18/docker
-      - ./instance/database:/backup
-    depends_on:
-      n8n_db:
-        condition: service_healthy
-    env_file:
-      - path: .env
-        required: true
 
   postgres_upgrade:
     <<: *service-postgres-upgrade
     profiles: [ "migration" ]
     volumes:
       - ./instance/postgres_data:/var/lib/postgresql
-    env_file:
-      - path: .env.db
-        required: true
 
   n8n_postgres_upgrade:
     <<: *service-postgres-upgrade
