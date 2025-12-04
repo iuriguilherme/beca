@@ -1,11 +1,11 @@
 {
-  "updatedAt": "2025-12-03T18:39:46.791Z",
+  "updatedAt": "2025-12-04T19:10:26.612Z",
   "createdAt": "2025-12-03T18:36:38.123Z",
   "id": "C3ibUZhGMn6SLTIA",
   "name": "persistence_step_v1",
   "description": null,
   "active": false,
-  "isArchived": false,
+  "isArchived": true,
   "nodes": [
     {
       "parameters": {
@@ -389,11 +389,18 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "17d44da6-ece1-45df-92fd-5e913fd58d64",
+  "versionId": "c4cf1d1e-c663-4421-8df0-7a851fc96709",
   "activeVersionId": null,
-  "versionCounter": 6,
+  "versionCounter": 8,
   "triggerCount": 0,
-  "tags": [],
+  "tags": [
+    {
+      "updatedAt": "2025-11-30T21:32:53.614Z",
+      "createdAt": "2025-11-30T21:32:53.614Z",
+      "id": "6U6qptHGr1glwU73",
+      "name": "level2"
+    }
+  ],
   "shared": [
     {
       "updatedAt": "2025-12-04T19:03:09.329Z",

@@ -1,11 +1,11 @@
 {
-  "updatedAt": "2025-11-30T22:11:36.633Z",
+  "updatedAt": "2025-12-04T19:10:08.536Z",
   "createdAt": "2025-11-30T21:32:57.509Z",
   "id": "JjAOLB59ilKQrjag",
   "name": "first_prompt_generator_v1",
   "description": null,
   "active": false,
-  "isArchived": false,
+  "isArchived": true,
   "nodes": [
     {
       "parameters": {
@@ -292,9 +292,9 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "e5be6907-93fc-47db-9e94-c99bd3f982f4",
+  "versionId": "054cecca-8b73-4178-8dc3-aaf1e759546b",
   "activeVersionId": null,
-  "versionCounter": 17,
+  "versionCounter": 18,
   "triggerCount": 0,
   "tags": [
     {

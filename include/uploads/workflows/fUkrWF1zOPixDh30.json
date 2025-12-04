@@ -1,11 +1,11 @@
 {
-  "updatedAt": "2025-11-30T21:54:31.687Z",
+  "updatedAt": "2025-12-04T19:10:17.893Z",
   "createdAt": "2025-11-30T20:41:52.774Z",
   "id": "fUkrWF1zOPixDh30",
-  "name": "skel_v3",
+  "name": "first_prompt_generator_v1.3",
   "description": null,
   "active": false,
-  "isArchived": false,
+  "isArchived": true,
   "nodes": [
     {
       "parameters": {
@@ -17,7 +17,7 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3,
       "position": [
-        472,
+        480,
         288
       ],
       "id": "d75f8bce-5b18-4178-9c8c-3932999ff4cd",
@@ -292,9 +292,9 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "3807557d-b825-460a-81ff-929ff7613628",
+  "versionId": "ef087726-8920-46a2-a644-189bc5033604",
   "activeVersionId": null,
-  "versionCounter": 14,
+  "versionCounter": 16,
   "triggerCount": 0,
   "tags": [],
   "shared": [

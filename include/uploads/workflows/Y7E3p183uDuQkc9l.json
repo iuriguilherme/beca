@@ -1,11 +1,11 @@
 {
-  "updatedAt": "2025-12-03T18:34:50.415Z",
+  "updatedAt": "2025-12-04T19:10:21.003Z",
   "createdAt": "2025-12-03T18:24:21.668Z",
   "id": "Y7E3p183uDuQkc9l",
   "name": "embedding_step_v1",
   "description": null,
   "active": false,
-  "isArchived": false,
+  "isArchived": true,
   "nodes": [
     {
       "parameters": {
@@ -88,7 +88,7 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3,
       "position": [
-        728,
+        736,
         16
       ],
       "id": "5954d6df-7768-4cb6-9b1d-03cb661f9641",
@@ -370,11 +370,18 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "2c14e0e9-8486-4e73-b987-9e0df8d9bb59",
+  "versionId": "b4380293-b2aa-48f6-a5f2-27b8faa03dd6",
   "activeVersionId": null,
-  "versionCounter": 5,
+  "versionCounter": 7,
   "triggerCount": 0,
-  "tags": [],
+  "tags": [
+    {
+      "updatedAt": "2025-11-30T21:32:53.614Z",
+      "createdAt": "2025-11-30T21:32:53.614Z",
+      "id": "6U6qptHGr1glwU73",
+      "name": "level2"
+    }
+  ],
   "shared": [
     {
       "updatedAt": "2025-12-04T19:03:09.329Z",

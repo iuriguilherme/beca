@@ -1,11 +1,11 @@
 {
-  "updatedAt": "2025-11-30T22:37:28.384Z",
+  "updatedAt": "2025-12-04T19:10:15.461Z",
   "createdAt": "2025-11-30T22:32:48.429Z",
   "id": "PvrT5fpPJ1A3dhTF",
-  "name": "Meta Prompt Generator",
+  "name": "first_prompt_generator_v1.2",
   "description": null,
   "active": false,
-  "isArchived": false,
+  "isArchived": true,
   "nodes": [
     {
       "parameters": {},
@@ -33,7 +33,7 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.7,
       "position": [
-        40,
+        48,
         -176
       ],
       "onError": "continueErrorOutput"
@@ -314,9 +314,9 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "c53ea920-d969-4d50-b700-8096e0468b40",
+  "versionId": "a69dc51c-0045-4c1a-8f57-4ec3a47544c1",
   "activeVersionId": null,
-  "versionCounter": 4,
+  "versionCounter": 6,
   "triggerCount": 0,
   "tags": [],
   "shared": [
